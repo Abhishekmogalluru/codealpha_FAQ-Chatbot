@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lyra — Literature & Poetics FAQ Chatbot</title>
+  <meta name="description" content="An interactive, rule-based literature FAQ assistant exploring poetry, song lyrics, poetic meter, literary forms, and verse analysis using client-side NLP tokenization, stemming, TF-IDF, and cosine similarity matching." />
+  <meta property="og:title" content="Lyra — Literature & Poetics FAQ Chatbot" />
+  <meta property="og:description" content="An interactive, rule-based literature FAQ assistant exploring poetry, song lyrics, poetic meter, literary forms, and verse analysis using client-side NLP tokenization, stemming, TF-IDF, and cosine similarity matching." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Google Fonts: Cormorant Garamond (Editorial Serif), Plus Jakarta Sans (UI Prose), Cinzel (Classical Heading) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['Cinzel', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            celadon: {
+              25: '#FAFDFB',
+              50: '#F4F8F5',
+              100: '#EAF2EC',
+              200: '#D9E7DD',
+              300: '#C2D7C8',
+              400: '#9DBEA7',
+              500: '#6E9E7C',
+              600: '#4A7F5B',
+              700: '#326242',
+              800: '#234A31',
+              900: '#173623',
+              950: '#0E2416'
+            },
+            forest: {
+              DEFAULT: '#1E4332',
+              hover: '#163526',
+              light: '#EBF4EE',
+              border: '#CFE2D5',
+              deep: '#11251B'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom sage scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #C8DDD0; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #A9C6B3; }
+
+    /* Greenish white ambient background shading */
+    .bg-greenish-white {
+      background: radial-gradient(circle at 15% 15%, #F8FCF9 0%, #EEF5F0 50%, #E6EFE8 100%);
+    }
+
+    /* Subtle shaded card elevation */
+    .shaded-card {
+      box-shadow: 0 4px 20px -2px rgba(23, 54, 35, 0.05), 0 1px 3px 0 rgba(23, 54, 35, 0.04);
+    }
+    .shaded-elevated {
+      box-shadow: 0 10px 25px -4px rgba(23, 54, 35, 0.08), 0 4px 6px -2px rgba(23, 54, 35, 0.04);
+    }
+
+    /* Editorial Drop Cap in Treatise view */
+    .treatise-drop-cap::first-letter {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      float: left;
+      font-size: 2.6rem;
+      line-height: 0.85;
+      padding-top: 3px;
+      padding-right: 8px;
+      color: #1E4332;
+      font-weight: 700;
+    }
+  </style>
+<script src="/_aistudio-iframe.js?v=2c34bde1"></script></head>
+<body class="bg-greenish-white text-[#152B1E] font-sans antialiased selection:bg-[#1E4332] selection:text-white min-h-screen flex flex-col items-center justify-between">
+
+  <!-- Main Viewport Container -->
+  <div class="w-full max-w-4xl flex-1 flex flex-col h-screen p-2.5 sm:p-4 md:py-5">
+
+    <!-- Top Bar: Greenish-White Shaded Header -->
+    <header class="bg-[#FAFDFB]/95 border border-[#CFDFD3] rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between shaded-card mb-3 shrink-0 backdrop-blur-md">
+      <div class="flex items-center gap-3">
+        <!-- Luminous Emerald & Celadon Crest -->
+        <div class="relative flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1E4332] via-[#2A5C44] to-[#153425] border border-[#3E7A5D]/40 flex items-center justify-center text-[#EAF3ED] shadow-sm">
+            <!-- Quill / Lyre Icon -->
+            <svg class="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a9 9 0 0 0-9 9c0 4.17 2.84 7.67 6.69 8.69L9 22l3-1 3 1-.69-2.31C18.16 18.67 21 15.17 21 11a9 9 0 0 0-9-9z"></path>
+              <path d="M12 6v6"></path>
+              <path d="M8 10h8"></path>
+            </svg>
+          </div>
+          <!-- Glowing Green Status Pip -->
+          <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#10B981] border-2 border-[#FAFDFB]" title="Deterministic NLP Active"></span>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-bold text-lg tracking-wider text-[#142B1E]">LYRA</h1>
+            <span class="text-[10px] font-mono tracking-wider uppercase text-[#1E4332] bg-[#E5F0E8] px-2 py-0.5 rounded-md border border-[#C5DCCB] font-semibold">POETICS & VERSE</span>
+            <!-- Info Button -->
+            <button id="infoBtn" class="w-5 h-5 rounded-full bg-[#EBF3ED] hover:bg-[#DDECE1] text-[#366046] hover:text-[#142B1E] flex items-center justify-center transition-colors text-xs font-serif italic border border-[#CFDFD3] cursor-pointer" title="NLP Pipeline & Curatorial Scope">
+              i
+            </button>
+          </div>
+          <p class="text-[11px] text-[#4A6D56] hidden sm:block">Deterministic Reference Engine for Poetic Forms, Songcraft & Meter</p>
+        </div>
+      </div>
+
+      <!-- Action Navigation Links -->
+      <div class="flex items-center gap-2">
+        <button id="browseBtn" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#EBF3ED] hover:bg-[#DDECE1] text-xs font-semibold text-[#183929] border border-[#CCDED1] hover:border-[#ADCBB4] transition-all cursor-pointer shadow-2xs">
+          <svg class="w-3.5 h-3.5 text-[#1E4332]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            <path d="M8 6h8"></path>
+            <path d="M8 10h8"></path>
+          </svg>
+          <span>Canon Archive (18)</span>
+        </button>
+
+        <button id="resetBtn" class="p-2 rounded-xl bg-[#EBF3ED] hover:bg-[#DDECE1] text-[#3E654D] hover:text-[#142B1E] border border-[#CCDED1] transition-all cursor-pointer shadow-2xs" title="Reset Conversation">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M8 16H3v5"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Chat Messages Viewport (Crisp Greenish White with soft shading) -->
+    <div id="chatScroll" class="flex-1 bg-[#FAFDFB]/95 border border-[#CFDFD3] rounded-2xl p-4 sm:p-5 overflow-y-auto space-y-4 shaded-card backdrop-blur-sm">
+      <!-- Dynamic Messages rendered here -->
+    </div>
+
+    <!-- Suggested Inquiries Rail with Shaded Celadon Pills -->
+    <div class="py-2.5 overflow-x-auto flex items-center gap-2 shrink-0" id="quickPills">
+      <span class="text-[11px] text-[#4A6D56] shrink-0 flex items-center gap-1.5 pl-1 font-mono uppercase tracking-wider font-semibold">
+        <svg class="w-3 h-3 text-[#1E4332]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        Prompt:
+      </span>
+      <!-- Pills inserted by JS -->
+    </div>
+
+    <!-- Greenish-White Shaded Command Input Form -->
+    <form id="chatForm" class="bg-[#FAFDFB] border border-[#CFDFD3] hover:border-[#96BFA2] focus-within:border-[#1E4332] rounded-2xl p-2 sm:p-2.5 flex items-center gap-2 shaded-card transition-all shrink-0">
+      <div class="pl-2 text-[#567E64] hidden sm:block">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <input
+        type="text"
+        id="chatInput"
+        placeholder="Inquire about poems, song lyrics, sonnets, meter, ballads, odes..."
+        class="flex-1 bg-transparent px-2.5 py-1.5 text-xs sm:text-sm text-[#142B1E] placeholder-[#739480] focus:outline-none font-medium"
+        autocomplete="off"
+      />
+      <button
+        type="submit"
+        id="sendBtn"
+        class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#1E4332] to-[#2B5E46] hover:from-[#163526] hover:to-[#224C38] text-white font-medium text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-sm cursor-pointer shrink-0"
+      >
+        <span>Analyze</span>
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- About Lyra Modal -->
+  <div id="aboutModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0A1A12]/45 backdrop-blur-xs">
+    <div class="bg-[#FAFDFB] border border-[#C5D8CB] rounded-2xl w-full max-w-lg shaded-elevated overflow-hidden text-[#152B1E]">
+      <div class="px-5 py-4 border-b border-[#D5E3D8] flex items-center justify-between bg-[#F0F6F2]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-[#1E4332] text-white flex items-center justify-center font-mono font-bold text-xs shadow-xs">§</div>
+          <div>
+            <h2 class="font-display font-semibold text-sm text-[#142B1E]">About Lyra</h2>
+            <p class="text-[11px] text-[#4A6D56]">Deterministic NLP Poetics & Songcraft Engine</p>
+          </div>
+        </div>
+        <button id="closeAboutBtn" class="p-1 rounded-lg text-[#567E64] hover:text-[#142B1E] hover:bg-[#E2EDE5] cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-3.5 text-xs text-[#284835] leading-relaxed max-h-[65vh] overflow-y-auto">
+        <p class="treatise-drop-cap font-serif text-sm text-[#152B1E]">
+          <strong>Lyra</strong> is an offline, client-side reference assistant engineered for the study of literary verse, song lyrics, poetic meters, and classical rhetoric. It executes an entirely deterministic Information Retrieval pipeline mimicking NLTK/SpaCy without remote LLM dependencies or hallucinations.
+        </p>
+
+        <div class="space-y-2 pt-1">
+          <div class="p-2.5 rounded-xl bg-[#F2F7F4] border border-[#D5E3D8]">
+            <span class="font-semibold text-[#142B1E]">1. Tokenization & Normalization:</span> Contractions expansion, punctuation stripping, and stopword pruning based on linguistic corpora.
+          </div>
+          <div class="p-2.5 rounded-xl bg-[#F2F7F4] border border-[#D5E3D8]">
+            <span class="font-semibold text-[#142B1E]">2. Algorithmic Porter Stemming:</span> Reduces morphological affixes to grammatical roots (e.g. <em>poetic, poems</em> &rarr; <em>poem</em>; <em>rhymed, rhyming</em> &rarr; <em>rhyme</em>).
+          </div>
+          <div class="p-2.5 rounded-xl bg-[#F2F7F4] border border-[#D5E3D8]">
+            <span class="font-semibold text-[#142B1E]">3. Vector Space (TF-IDF):</span> Maps questions into sparse geometric vectors weighted by term frequency and smoothed inverse document frequency.
+          </div>
+          <div class="p-2.5 rounded-xl bg-[#F2F7F4] border border-[#D5E3D8]">
+            <span class="font-semibold text-[#142B1E]">4. Cosine Metric & Intent Routing:</span> Measures vector cosine angles, exact phrase matches, and comparative routing (e.g., distinguishing <em>"what is a poem"</em> from <em>"poem vs song"</em>).
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-[#E5F1E8] text-[11px] text-[#1E4332] border border-[#BED7C5]">
+          <strong>Curatorial Scope:</strong> 18 canon chapters spanning poems, songs, sonnets, ballads, odes, elegies, epic narratives, haikus, verse drama, metrical feet, rhyme types, and prose taxonomy.
+        </div>
+      </div>
+
+      <div class="px-5 py-3 border-t border-[#D5E3D8] bg-[#F0F6F2] text-right">
+        <button id="gotItBtn" class="px-4 py-1.5 rounded-xl bg-[#1E4332] hover:bg-[#163526] text-white text-xs font-medium cursor-pointer shadow-xs">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Browse Canon Archive Modal -->
+  <div id="browseModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0A1A12]/45 backdrop-blur-xs">
+    <div class="bg-[#FAFDFB] border border-[#C5D8CB] rounded-2xl w-full max-w-2xl max-h-[82vh] flex flex-col shaded-elevated overflow-hidden text-[#152B1E]">
+      <div class="px-5 py-3.5 border-b border-[#D5E3D8] flex items-center justify-between bg-[#F0F6F2]">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-[#1E4332]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <h2 class="font-display font-semibold text-[#142B1E] text-sm">Literary Canon Archive</h2>
+        </div>
+        <button id="closeBrowseBtn" class="p-1 rounded-lg text-[#567E64] hover:text-[#142B1E] hover:bg-[#E2EDE5] cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- Live Category & Search Filter -->
+      <div class="p-3 border-b border-[#D5E3D8] bg-[#F5F9F6] space-y-2">
+        <input type="text" id="faqSearchInput" placeholder="Filter questions by concept (e.g. song, sonnet, meter, poem vs song)..." class="w-full bg-white border border-[#CFDFD3] rounded-xl px-3 py-1.5 text-xs text-[#142B1E] placeholder-[#739480] focus:outline-none focus:border-[#1E4332] shadow-2xs" />
+        
+        <!-- Filter Tabs with Greenish White Shading -->
+        <div class="flex items-center gap-1 overflow-x-auto text-[11px]" id="categoryFilterRow">
+          <button data-cat="all" class="cat-filter-btn px-2.5 py-1 rounded-lg bg-[#1E4332] text-white font-medium cursor-pointer shadow-2xs">All (18)</button>
+          <button data-cat="poetics" class="cat-filter-btn px-2.5 py-1 rounded-lg bg-[#E7F0E9] hover:bg-[#D9E7DD] text-[#284835] cursor-pointer">Poetics</button>
+          <button data-cat="songcraft" class="cat-filter-btn px-2.5 py-1 rounded-lg bg-[#E7F0E9] hover:bg-[#D9E7DD] text-[#284835] cursor-pointer">Songcraft</button>
+          <button data-cat="forms" class="cat-filter-btn px-2.5 py-1 rounded-lg bg-[#E7F0E9] hover:bg-[#D9E7DD] text-[#284835] cursor-pointer">Forms</button>
+          <button data-cat="comparative" class="cat-filter-btn px-2.5 py-1 rounded-lg bg-[#E7F0E9] hover:bg-[#D9E7DD] text-[#284835] cursor-pointer">Comparative</button>
+          <button data-cat="devices" class="cat-filter-btn px-2.5 py-1 rounded-lg bg-[#E7F0E9] hover:bg-[#D9E7DD] text-[#284835] cursor-pointer">Devices</button>
+        </div>
+      </div>
+
+      <!-- List of Articles -->
+      <div id="browseList" class="p-3 overflow-y-auto space-y-2 flex-1"></div>
+
+      <div class="px-4 py-2.5 border-t border-[#D5E3D8] text-right bg-[#F0F6F2]">
+        <button id="closeBrowseFooterBtn" class="px-3.5 py-1 rounded-lg bg-[#E2EDE5] hover:bg-[#D2E2D6] text-[#1E4332] text-xs font-semibold cursor-pointer">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STANDALONE NLP & APPLICATION JAVASCRIPT -->
+  <script>
+    // --- LITERATURE & POETICS FAQ ARCHIVE (18 DETAILED CURATIONS) ---
+    const FAQ_DATABASE = [
+      {
+        id: 'what-is-poetry-poem',
+        category: 'poetics',
+        primaryEntity: 'poem',
+        question: 'What is poetry and what are poems?',
+        shortAnswer: 'Poetry is a literary art form that organizes language through intentional line breaks, rhythm, and sonic qualities (meter, rhyme, and assonance) to evoke imaginative awareness, emotional depth, and sensory meaning beyond prosaic speech.',
+        fullAnswer: `Poetry derives from the ancient Greek 'poiesis' (meaning "to make" or "to create"). A poem is an autonomous composition where every linguistic choice—sound, silence, syntax, lineation, and figurative resonance—carries deliberate weight.
+
+Key architectural pillars of poetry:
+1. Lineation & Enjambment: Unlike prose which fills the width of the page, a poem's line breaks are intentional units of rhythm and breath. Enjambment carries a syntactic thought across line breaks without terminal punctuation, generating tension and surprise.
+2. Economy of Language: Poetry distills vast emotional landscapes into concentrated imagery and metaphor.
+3. Sound & Phonaesthetics: Through alliteration, consonance, assonance, and meter, poets craft verbal music designed to be spoken aloud.
+4. Stanzaic Architecture: Stanzas (from the Italian for "room") organize thought into couplets, tercets, quatrains, or open cantos.
+
+Notable Exemplars: Emily Dickinson, John Keats, Rainer Maria Rilke, Langston Hughes, and Sylvia Plath.`,
+        keywords: ['poem', 'poems', 'poetry', 'what is poetry', 'what is a poem', 'what are poems', 'define poetry', 'verse', 'stanzas', 'poetic'],
+        relatedQuestionIds: ['poem-vs-song', 'what-are-songs', 'meter-and-rhythm', 'what-is-a-sonnet']
+      },
+      {
+        id: 'what-are-songs',
+        category: 'songcraft',
+        primaryEntity: 'song',
+        question: 'What are songs and what are song lyrics?',
+        shortAnswer: 'A song is a musical composition pairing human vocalization with melody, rhythm, and harmonic accompaniment, whose lyrics are structured into verses, choruses, hooks, and bridges crafted specifically for auditory resonance and memorable phrasing.',
+        fullAnswer: `A song represents one of humanity's oldest artistic traditions, originating in oral folklore where poetry and musical chants were indistinguishable. 
+
+Key elements of songcraft & lyrics:
+1. Verse-Chorus Anatomy: Modern songs typically balance narrative progression (Verses), the central thematic and musical climax (Chorus/Refrain), transitional shifts (Pre-Chorus), and emotional revelations or harmonic departures (Bridge).
+2. The Hook: A concise melodic, rhythmic, or lyrical motif designed to grab attention and lodge in auditory memory.
+3. Prosody: The seamless alignment of natural verbal stress with musical meter. A master songwriter ensures that important words coincide with musical downbeats and harmonic resolutions.
+4. Collaborative Symbiosis: Song lyrics exist in intimate dialogue with tempo, instrumentation, vocal timbre, and production dynamics.
+
+Historical & Modern Masters: From the troubadours and Sapphic bards to Bob Dylan (Nobel laureate in Literature), Joni Mitchell, Paul Simon, Stevie Wonder, and Leonard Cohen.`,
+        keywords: ['song', 'songs', 'lyrics', 'what is a song', 'what are songs', 'songwriting', 'song lyrics', 'chorus', 'verse', 'hooks'],
+        relatedQuestionIds: ['poem-vs-song', 'what-is-ballad', 'what-is-lyric-poetry']
+      },
+      {
+        id: 'poem-vs-song',
+        category: 'comparative',
+        question: 'What is the difference between a poem and a song?',
+        shortAnswer: 'A poem is self-sufficient, creating its entire rhythm, music, and breath strictly through written and spoken words; a song is fundamentally symbiotic with vocal melody, pitch, tempo, and instrumental accompaniment.',
+        fullAnswer: `While poetry and songs share ancient roots in oral traditions, they diverge profoundly in their formal demands:
+
+1. Musical Independence vs. Dependency:
+- A poem must generate its complete sonic architecture on the silent page or through natural speech cadence.
+- A song lyric is written to be sung; words that look simple or repetitive on paper come alive when paired with melodic counterpoint, harmony, and rhythm.
+
+2. Repetition & Cognitive Cadence:
+- Songs rely heavily on repetition—choruses, hooks, and refrains—to ground listeners in an ephemeral auditory medium.
+- Poems rarely repeat entire stanzas unless utilizing formal repeating structures (such as the villanelle or sestina), favoring dense, evolving imagery.
+
+3. Syllabic Flexibility (Melisma):
+- A singer can stretch a single syllable across multiple ascending or descending musical notes (melisma), whereas a poet is bound to the natural metrical duration of spoken syllables.
+
+4. Page Lineation vs. Musical Bar:
+- The poet's primary expressive unit is the line break and stanza space. The songwriter's primary unit is the musical measure (time signature and chord progression).`,
+        keywords: ['difference between poem and song', 'poem vs song', 'compare poem and song', 'is a song a poem', 'lyrics vs poetry', 'poem or song'],
+        relatedQuestionIds: ['what-is-poetry-poem', 'what-are-songs', 'what-is-lyric-poetry', 'what-is-ballad']
+      },
+      {
+        id: 'what-is-a-sonnet',
+        category: 'forms',
+        primaryEntity: 'sonnet',
+        question: 'What is a sonnet and how is it structured?',
+        shortAnswer: 'A sonnet is a 14-line lyric poem traditionally written in iambic pentameter with an exacting rhyme scheme, centered around a dramatic argumentative shift or thematic turning point known as the volta.',
+        fullAnswer: `Originating in 13th-century Italy ('sonetto', meaning "little song"), the sonnet became one of the most durable poetic vessels in Western literature.
+
+Major Sonnet Traditions:
+1. The Petrarchan (Italian) Sonnet:
+- Structure: Divided into an 8-line Octave (rhyming ABBAABBA) and a 6-line Sestet (rhyming CDECDE or CDCDCD).
+- Rhetorical Function: The octave establishes an emotional predicament, conflict, or question; the sestet delivers a resolution or philosophical contemplation following the Volta (the turn) at line 9.
+
+2. The Shakespearean (English) Sonnet:
+- Structure: Divided into three 4-line Quatrains and a final rhyming Couplet (ABAB CDCD EFEF GG).
+- Rhetorical Function: The three quatrains explore three aspects or metaphors of an idea, and the final heroic couplet delivers an epigrammatic, often surprising conclusion.
+
+Famous Line: "Shall I compare thee to a summer's day? / Thou art more lovely and more temperate..." (Shakespeare, Sonnet 18).`,
+        keywords: ['sonnet', 'sonnets', 'what is a sonnet', 'shakespearean sonnet', 'petrarchan sonnet', 'volta', '14 lines', 'iambic pentameter'],
+        relatedQuestionIds: ['meter-and-rhythm', 'what-is-an-ode', 'rhyme-schemes-types']
+      },
+      {
+        id: 'what-is-ballad',
+        category: 'forms',
+        primaryEntity: 'ballad',
+        question: 'What is a ballad and how does it bridge song and narrative poetry?',
+        shortAnswer: 'A ballad is a narrative poem or folk song that dramatizes a tale of romance, tragedy, betrayal, or heroism, traditionally composed in four-line stanzas (ballad meter) with alternating iambic tetrameter and trimeter.',
+        fullAnswer: `Ballads stand as the historic bridge between oral folk songs and written literature. Passed down by wandering minstrels, they were designed for communal singing and memory.
+
+Formal Anatomy of the Ballad:
+1. Ballad Stanza: Quatrains alternating four-beat lines (iambic tetrameter) and three-beat lines (iambic trimeter).
+2. Rhyme Scheme: Predominantly ABCB or ABAB.
+3. Dramatic Storytelling: Ballads plunge directly into action ('in medias res'), relying on dialogue, sudden dramatic twists, and haunting recurring refrains.
+4. Themes: Feuds, ghosts, tragic lovers, shipwrecks, and outlaw heroes (e.g. Robin Hood).
+
+Evolution:
+- Folk/Traditional Ballads: Anonymous medieval songs like "Barbara Allen" or "Sir Patrick Spens".
+- Literary Ballads: Romantic poets adopted the form to explore psychological depth, such as Samuel Taylor Coleridge's "The Rime of the Ancient Mariner" and John Keats's "La Belle Dame sans Merci".`,
+        keywords: ['ballad', 'ballads', 'what is a ballad', 'ballad stanza', 'narrative poetry', 'folk song', 'rime of the ancient mariner'],
+        relatedQuestionIds: ['what-are-songs', 'poem-vs-song', 'epic-poetry']
+      },
+      {
+        id: 'what-is-an-ode',
+        category: 'forms',
+        primaryEntity: 'ode',
+        question: 'What is an ode and why is it used for praise?',
+        shortAnswer: 'An ode is an exalted, ceremonious lyric poem of formal address and meditation, composed to praise, commemorate, or deeply contemplate a revered person, artwork, natural element, or transcendent concept.',
+        fullAnswer: `Stemming from ancient Greek choral traditions, the ode is characterized by elevated tone, passionate lyricism, and philosophical introspection.
+
+The Three Major Forms:
+1. Pindaric Ode: Modeled on Pindar's athletic hymns; majestic, choric, and public, structured in triplets: Strophe (turn), Antistrophe (counter-turn), and Epode (stand).
+2. Horatian Ode: Modeled on Roman poet Horace; tranquil, personal, meditative, and written in uniform stanza lengths (e.g. Andrew Marvell's "Horatian Ode").
+3. Romantic / English Ode: Developed by 19th-century poets, balancing formal stanzaic elegance with intense psychological and sensory immersion.
+
+Pinnacles of the Form:
+John Keats's 1819 Odes ("Ode on a Grecian Urn", "Ode to a Nightingale", "To Autumn"), Percy Bysshe Shelley's "Ode to the West Wind", and Pablo Neruda's celebration of everyday objects in "Elemental Odes".`,
+        keywords: ['ode', 'odes', 'what is an ode', 'keats', 'pindaric ode', 'horatian ode', 'ode to a nightingale', 'praise poem'],
+        relatedQuestionIds: ['what-is-elegy', 'what-is-a-sonnet', 'what-is-lyric-poetry']
+      },
+      {
+        id: 'what-is-elegy',
+        category: 'forms',
+        primaryEntity: 'elegy',
+        question: 'What is an elegy and how does it mourn loss?',
+        shortAnswer: 'An elegy is a reflective, somber poem written to lament the death of an individual or mourn a profound loss, traditionally traversing three emotional movements: grief, remembrance, and eventual consolation.',
+        fullAnswer: `Originally an ancient Greek metrical designation (elegiac couplets of hexameter and pentameter), the elegy transformed in the English tradition into the premier poetic response to mortality.
+
+The Three Psychological Movements of the Elegy:
+1. Lamentation: The raw expression of bewilderment, shock, and acute sorrow over loss.
+2. Praise & Eulogy: Celebrating the virtues, life, and spirit of the deceased.
+3. Consolation: The gradual arrival at philosophical solace, transcendental hope, or reconciliation with the cycles of nature.
+
+Landmark Elegies:
+- John Milton's "Lycidas" (pastoral elegy for Edward King)
+- Thomas Gray's "Elegy Written in a Country Churchyard" (universal meditation on forgotten rustic lives)
+- Walt Whitman's "When Lilacs Last in the Dooryard Bloom'd" (mourning Abraham Lincoln)
+- W.H. Auden's "In Memory of W. B. Yeats" ("Earth, receive an honoured guest: / William Yeats is laid to rest")`,
+        keywords: ['elegy', 'elegies', 'what is an elegy', 'mourning poem', 'grief', 'funeral poem', 'lament', 'loss'],
+        relatedQuestionIds: ['what-is-an-ode', 'what-is-lyric-poetry', 'what-is-poetry-poem']
+      },
+      {
+        id: 'epic-poetry',
+        category: 'forms',
+        primaryEntity: 'epic',
+        question: 'What is epic poetry and what are its defining conventions?',
+        shortAnswer: 'An epic is a grand, monumental narrative poem chronicling the heroic deeds of legendary figures, decisive historical conflicts, and divine cosmic struggles that define the identity of an entire civilization.',
+        fullAnswer: `Epics represent literature on its most heroic and panoramic scale, originally recited across days by oral bards.
+
+Signature Epic Conventions:
+1. Invocation of the Muse: The poet begins by imploring a divine muse for inspiration (e.g. "Sing in me, Muse..." in the Odyssey; "Of Man's First Disobedience..." in Paradise Lost).
+2. 'In Medias Res': The narrative plunges directly into the middle of the crisis rather than chronological beginnings.
+3. Epic / Homeric Simile: Extended, ornate comparisons running across multiple lines to heighten dramatic tension.
+4. Epithets & Catalogues: Stylized identifying tags ("swift-footed Achilles", "wine-dark sea") and sweeping inventories of armies and armaments.
+5. Vast Mythic Canvas: Setting spans entire continents, underworlds, and celestial realms with active intervention by gods or cosmic forces.
+
+Foundational Texts: The Epic of Gilgamesh (Mesopotamia), Homer's Iliad and Odyssey (Greece), Virgil's Aeneid (Rome), the Mahabharata and Ramayana (India), Dante's Divine Comedy (Italy), and John Milton's Paradise Lost (England).`,
+        keywords: ['epic', 'epics', 'epic poetry', 'what is an epic', 'homer', 'iliad', 'odyssey', 'paradise lost', 'heroic narrative'],
+        relatedQuestionIds: ['what-is-ballad', 'prose-vs-poetry', 'drama-verse-plays']
+      },
+      {
+        id: 'free-verse-poetry',
+        category: 'poetics',
+        primaryEntity: 'free verse',
+        question: 'What is free verse (vers libre) and how does it create rhythm without meter?',
+        shortAnswer: 'Free verse is poetry liberated from regular metrical schemes, syllable counts, and predetermined rhymes, establishing its rhythm instead through natural speech cadences, syntactic parallelism, and deliberate line breaks.',
+        fullAnswer: `Contrary to popular misconception, free verse is not chaotic or formless; as T.S. Eliot famously noted, "No verse is free for the man who wants to do a good job."
+
+How Free Verse Generates Music:
+1. Cadence & Breath: The rhythm corresponds to the physiological cadence of breathing and emotional pacing rather than a mechanical metronome.
+2. Syntactic Parallelism: Borrowing from Biblical psalms, free verse employs anaphora (repeating initial phrases) and catalogue structures to create sweeping waves of resonance.
+3. Visual Topography: The physical arrangement of text on white page margins guides pauses, emphasis, and reading tempo.
+4. Internal Soundscapes: Poets weave dense internal rhymes, assonance, and consonance without needing rigid end-rhymes.
+
+The Revolution:
+While precursors existed, Walt Whitman pioneered English free verse in 'Leaves of Grass' (1855), opening the doorway for 20th-century modernists like T.S. Eliot, Ezra Pound, William Carlos Williams, and Allen Ginsberg.`,
+        keywords: ['free verse', 'vers libre', 'what is free verse', 'open form', 'whitman', 'unrhymed poetry', 'no meter'],
+        relatedQuestionIds: ['meter-and-rhythm', 'what-is-poetry-poem', 'rhyme-schemes-types']
+      },
+      {
+        id: 'what-is-haiku',
+        category: 'forms',
+        primaryEntity: 'haiku',
+        question: 'What is a haiku and what are its traditional Japanese rules?',
+        shortAnswer: 'A haiku is a concise Japanese poetic form consisting of three unrhymed phrases of 5, 7, and 5 syllables (on/morae), designed to capture an ephemeral moment in nature through sensory juxtaposition.',
+        fullAnswer: `Originating from the opening verse ('hokku') of traditional Japanese linked-verse renga, the haiku distills a universe of meaning into a single breath.
+
+The Three Core Pillars of Classical Haiku:
+1. 5-7-5 Structure: In Japanese, 17 'on' (phonetic sounds/morae) arranged in three phrases: five, seven, and five. In English, poets honor this cadence while prioritizing brevity and clarity.
+2. Kigo (Seasonal Indicator): A word or phrase that firmly grounds the poem in a specific season (e.g. cherry blossom = spring; cicada = summer; falling leaf = autumn; frost = winter).
+3. Kireji (The Cutting Word): A structural pause or turn (represented in English by a dash or colon) that splits the poem into two complementary images, sparking an intuitive flash of insight between them.
+
+The Masterpiece:
+"An old silent pond... / A frog jumps into the water, / A deep splash of sound." (Matsuo Bashō, 1686).`,
+        keywords: ['haiku', 'haikus', 'what is a haiku', '5-7-5', 'basho', 'kigo', 'kireji', 'japanese poetry', 'syllables'],
+        relatedQuestionIds: ['what-is-poetry-poem', 'meter-and-rhythm', 'literary-devices-figurative']
+      },
+      {
+        id: 'meter-and-rhythm',
+        category: 'poetics',
+        primaryEntity: 'meter',
+        question: 'What is poetic meter and how do poetic feet (iamb, trochee, etc.) work?',
+        shortAnswer: 'Meter is the systematic rhythmic blueprint of a poem, measured by recurring patterns of stressed (/) and unstressed (x) syllables grouped into units called poetic feet.',
+        fullAnswer: `In English accentual-syllabic verse, rhythm is organized into five fundamental poetic feet:
+
+1. The Iamb (Iambic): Unstressed followed by Stressed (x /)
+- Sound: "da-DUM" (mimics the human heartbeat and natural English speech).
+- Example: "The curfew tolls the knell of parting day."
+
+2. The Trochee (Trochaic): Stressed followed by Unstressed (/ x)
+- Sound: "DUM-da" (urgent, incantatory, dramatic).
+- Example: "Double, double toil and trouble; / Fire burn and cauldron bubble." (Macbeth).
+
+3. The Anapest (Anapestic): Two Unstressed followed by Stressed (x x /)
+- Sound: "da-da-DUM" (galloping, energetic).
+- Example: "Like a child from the womb, like a ghost from the tomb..." (Shelley).
+
+4. The Dactyl (Dactylic): Stressed followed by two Unstressed (/ x x)
+- Sound: "DUM-da-da" (waltzing, falling).
+- Example: "Picture yourself in a boat on a river..."
+
+5. The Spondee (Spondaic): Two Stressed syllables (/ /)
+- Sound: "DUM-DUM" (used for heavy dramatic emphasis).
+
+Line Length Terminology:
+Monometer (1 foot), Dimeter (2), Trimeter (3), Tetrameter (4), Pentameter (5), Hexameter (6). Thus, Shakespeare's dominant line is Iambic Pentameter (5 iambic feet = 10 syllables).`,
+        keywords: ['meter', 'metrical', 'rhythm', 'iambic', 'iambic pentameter', 'trochee', 'anapest', 'dactyl', 'spondee', 'scansion', 'poetic feet'],
+        relatedQuestionIds: ['what-is-a-sonnet', 'rhyme-schemes-types', 'free-verse-poetry']
+      },
+      {
+        id: 'rhyme-schemes-types',
+        category: 'poetics',
+        primaryEntity: 'rhyme',
+        question: 'What is rhyme scheme and what different types of rhyme exist?',
+        shortAnswer: 'A rhyme scheme is the coded blueprint of end rhymes in a stanza (e.g. ABAB, AABB); poetic rhyme encompasses exact rhymes, slant rhymes, internal rhymes, and eye rhymes.',
+        fullAnswer: `Rhyme creates sonic cohesion, expectation, and musical resonance. 
+
+Common Rhyme Schemes:
+- Couplet (AA BB CC): Tight, epigrammatic pairs.
+- Alternating / Cross Rhyme (ABAB): Balances forward propulsion with symmetry.
+- Enclosed Rhyme (ABBA): Frames the internal couplet, evoking containment.
+- Terza Rima (ABA BCB CDC): Interlocking tercets invented by Dante.
+
+Essential Types of Rhyme:
+1. Exact / True Rhyme: Identical vowel and subsequent consonants with different initial consonants (e.g. light / night, flower / power).
+2. Slant / Half / Near Rhyme: Vowel sounds or final consonants match partially, creating sophisticated dissonance (e.g. soul / all; stone / one; worm / swarm). Emily Dickinson was a legendary master of slant rhyme.
+3. Internal Rhyme: Rhyming words placed within the same single line of verse: "Once upon a midnight dreary, while I pondered, weak and weary" (Edgar Allan Poe).
+4. Eye Rhyme: Words that appear identical in spelling on the page but sound different aloud (e.g. rough / cough; love / prove).`,
+        keywords: ['rhyme', 'rhymes', 'rhyme scheme', 'slant rhyme', 'half rhyme', 'internal rhyme', 'eye rhyme', 'abab', 'aabb', 'poetic rhyme'],
+        relatedQuestionIds: ['meter-and-rhythm', 'what-is-a-sonnet', 'what-is-poetry-poem']
+      },
+      {
+        id: 'literary-devices-figurative',
+        category: 'devices',
+        primaryEntity: 'literary devices',
+        question: 'What are literary devices and figurative language?',
+        shortAnswer: 'Literary devices and figurative language are stylistic techniques that transcend literal terminology to create vivid imagery, emotional depth, metaphoric comparisons, and symbolic resonances.',
+        fullAnswer: `Literary devices equip authors and poets to say one thing in terms of another, awakening the reader's imagination:
+
+1. Metaphor: An implicit, direct identification between two unrelated things without using "like" or "as": "All the world's a stage, and all the men and women merely players." (Shakespeare).
+2. Simile: An explicit comparison employing "like" or "as": "My love is like a red, red rose / That's newly sprung in June." (Robert Burns).
+3. Personification: Attributing human emotions, consciousness, or agency to inanimate objects or abstractions: "The wind whispered through the pines."
+4. Alliteration: The deliberate repetition of identical initial consonant sounds across consecutive words: "Full fathom five thy father lies."
+5. Hyperbole: Purposeful, extravagant exaggeration used to evoke intense feeling: "I'll love you till the ocean is folded and hung up to dry." (Auden).
+6. Synecdoche & Metonymy: Using a part to represent the whole ("all hands on deck" = crew) or an associated concept to represent a greater entity ("the Crown" = monarchical government).`,
+        keywords: ['literary devices', 'figurative language', 'metaphor', 'simile', 'personification', 'alliteration', 'hyperbole', 'symbolism', 'figures of speech'],
+        relatedQuestionIds: ['what-is-poetry-poem', 'what-is-prose', 'meter-and-rhythm']
+      },
+      {
+        id: 'what-is-prose',
+        category: 'prose',
+        primaryEntity: 'prose',
+        question: 'What is prose and how does it differ from verse?',
+        shortAnswer: 'Prose is written or spoken language in its ordinary grammatical and syntactic form, structured through sentences and paragraphs without metrical constraints, forming the basis of novels, essays, and journalism.',
+        fullAnswer: `Prose (from the Latin 'prosa oratio', meaning "straightforward speech") is the prevailing medium for narrative storytelling, philosophical inquiry, scientific documentation, and daily communication.
+
+Key Characteristics of Prose:
+1. Sentence & Paragraph Structure: Prose flows continuously from margin to margin, wrapping naturally based on page width rather than deliberate authorial line breaks.
+2. Grammatical Cadence: Guided by grammatical coherence, syntax, and voice rather than metrical beats or poetic feet.
+3. Spectrum of Prose:
+- Narrative Fiction: Novels, novellas, and short stories creating constructed worlds.
+- Non-Fiction: Biographies, historical treatises, philosophical dialogues, critical essays.
+- Lyrical / Poetic Prose: Prose that incorporates rich imagery, cadence, and phonaesthetics while retaining unmetered paragraph blocks (e.g. Virginia Woolf, James Joyce, Gabriel García Márquez).`,
+        keywords: ['prose', 'what is prose', 'prose meaning', 'sentences', 'paragraphs', 'fiction', 'essays', 'prose vs verse'],
+        relatedQuestionIds: ['prose-vs-poetry', 'novel-novella-short-story', 'drama-verse-plays']
+      },
+      {
+        id: 'prose-vs-poetry',
+        category: 'comparative',
+        question: 'What is the difference between poetry and prose?',
+        shortAnswer: 'Poetry organizes language around the intentional line break, metrical rhythms, and concentrated acoustic imagery; prose organizes language around grammatical sentences and continuous paragraph blocks.',
+        fullAnswer: `The divide between poetry and prose is one of the most foundational distinctions in literary art:
+
+1. The Sovereign Line Break vs. The Paragraph:
+- In poetry, the line break is a deliberate aesthetic and rhythmic choice determined exclusively by the author. A poem retains its exact lineation regardless of screen or page size.
+- In prose, text fills the typographic container and breaks mechanically at margins; the paragraph is the primary structural unit.
+
+2. Density of Meaning & Syntax:
+- Poetry frequently bends or dissolves conventional grammar, utilizing elliptical syntax, sonic echoes, and compressed metaphor.
+- Prose typically preserves narrative continuity and grammatical clarity to develop characters, scenes, and logical progressions.
+
+3. Rhythm & Acoustics:
+- Poetry explicitly sculpts acoustic pacing through meter, syllable counts, rhyme, and enjambment.
+- Prose has its own natural cadence, but is unconstrained by formal metrical feet.
+
+Hybrid Form — The Prose Poem:
+Invented by 19th-century French symbolists (Aloysius Bertrand, Charles Baudelaire, Arthur Rimbaud), the prose poem adopts paragraph blocks while maintaining the compression, heightened imagery, and sonic intensity of verse.`,
+        keywords: ['difference between poetry and prose', 'poetry vs prose', 'compare poetry and prose', 'poem vs prose', 'prose or poetry'],
+        relatedQuestionIds: ['what-is-poetry-poem', 'what-is-prose', 'poem-vs-song']
+      },
+      {
+        id: 'what-is-lyric-poetry',
+        category: 'poetics',
+        primaryEntity: 'lyric',
+        question: 'What is lyric poetry and how did it originate?',
+        shortAnswer: 'Lyric poetry is a formal poetic genre that gives voice to intense personal emotions and subjective reflections, traditionally spoken in the first person ("I") and originating as ancient Greek songs sung to the lyre.',
+        fullAnswer: `In classical Greece, poetry was divided into three grand categories: Epic (narrative tales of grand events), Dramatic (plays written for actors), and Lyric (intimate personal songs performed to the strumming of the stringed lyre).
+
+Characteristics of Lyric Poetry:
+1. Subjective Consciousness: Expresses the inner psychological, romantic, or spiritual state of a single speaker rather than recounting a broad plot.
+2. Melodic Phrasing: Highly musical, rhythmic, and sensorially evocative language.
+3. Brevity & Intensity: Concentrated emotional arc capturing an epiphany, a sorrow, or an ecstatic revelation.
+
+Evolution:
+From ancient Greek poets Sappho and Pindar and Latin lyricists Catullus and Horace, lyric poetry evolved to become the dominant mode of modern poetry in the works of John Keats, Percy Bysshe Shelley, Emily Dickinson, and modern confessional poets like Robert Lowell and Sylvia Plath.`,
+        keywords: ['lyric poetry', 'lyric', 'lyrics', 'what is lyric poetry', 'sappho', 'first person poetry', 'subjective poetry', 'lyre'],
+        relatedQuestionIds: ['what-are-songs', 'poem-vs-song', 'what-is-an-ode', 'what-is-elegy']
+      },
+      {
+        id: 'novel-novella-short-story',
+        category: 'prose',
+        primaryEntity: 'fiction',
+        question: 'What is the difference between a novel, a novella, and a short story?',
+        shortAnswer: 'The distinction is defined by word count and narrative scope: short stories capture a single unified impression; novellas explore richer character psychology without sprawling subplots; novels build multifaceted, multi-layered worlds.',
+        fullAnswer: `Prose fiction is categorized into three primary structural magnitudes:
+
+1. Short Story (Under 7,500 words):
+- Scope: Focuses on a single central incident, a unified emotional tone, and an epiphany.
+- Economy: Minimal backstories; every sentence drives toward a climactic revelation.
+- Masters: Edgar Allan Poe, Anton Chekhov, Flannery O'Connor, Jorge Luis Borges.
+
+2. Novella (17,500 to 40,000 words):
+- Scope: Longer than a short story but more focused and intense than a novel; delves into nuanced psychological states and symbolic motifs without sprawling subplots.
+- Masters: Franz Kafka ('The Metamorphosis'), George Orwell ('Animal Farm'), Ernest Hemingway ('The Old Man and the Sea'), Joseph Conrad ('Heart of Darkness').
+
+3. Novel (40,000 to 100,000+ words):
+- Scope: A panoramic narrative featuring multiple character arcs, complex subplots, evolving societal themes, and extensive world-building.
+- Masters: Jane Austen, Leo Tolstoy, Virginia Woolf, Gabriel García Márquez.`,
+        keywords: ['novel', 'novella', 'short story', 'difference novel novella short story', 'word count', 'fiction forms', 'prose fiction'],
+        relatedQuestionIds: ['what-is-prose', 'prose-vs-poetry', 'drama-verse-plays']
+      },
+      {
+        id: 'drama-verse-plays',
+        category: 'forms',
+        primaryEntity: 'drama',
+        question: 'What is drama and what is verse drama (dramatic poetry)?',
+        shortAnswer: 'Drama is literature written specifically for theatrical enactment through embodied dialogue and stage action; verse drama is theatrical drama composed in poetic meter (most famously unrhymed blank verse).',
+        fullAnswer: `Drama (from the Greek 'dran', meaning "to do" or "to act") transforms written literature into living, embodied performance.
+
+Key Dimensions of Drama:
+1. Conflict & Action: Propelled forward through dialogue, subtext, dramatic tension, and character objectives.
+2. Dramatic Irony & Soliloquies: When the audience possesses vital knowledge that characters onstage do not, or when a character speaks their innermost reflections aloud alone (e.g. Hamlet's "To be or not to be").
+
+Verse Drama & Blank Verse:
+For much of Western history, the greatest plays were written in verse rather than prose:
+- Ancient Greek Tragedy: Aeschylus, Sophocles, and Euripides combining iambic trimeter dialogue with grand lyric choral odes.
+- Elizabethan & Jacobean Theatre: Christopher Marlowe and William Shakespeare elevated unrhymed iambic pentameter (blank verse) into the definitive vehicle for English tragic drama, allowing verse to mimic the natural flexibility of passionate human speech.`,
+        keywords: ['drama', 'plays', 'verse drama', 'dramatic poetry', 'shakespeare', 'theatre', 'blank verse', 'soliloquy', 'tragedy'],
+        relatedQuestionIds: ['meter-and-rhythm', 'epic-poetry', 'prose-vs-poetry']
+      }
+    ];
+
+    // --- NLP STOPWORDS & LITERATURE SYNONYM MAP ---
+    const STOPWORDS = new Set([
+      'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren',
+      'as', 'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by',
+      'can', 'cannot', 'could', 'couldn', 'did', 'didn', 'do', 'does', 'doesn', 'doing', 'don', 'down',
+      'during', 'each', 'few', 'for', 'from', 'further', 'had', 'hadn', 'has', 'hasn', 'have', 'haven',
+      'having', 'he', 'her', 'here', 'hers', 'herself', 'him', 'himself', 'his', 'how', 'i', 'if', 'in',
+      'into', 'is', 'isn', 'it', 'its', 'itself', 'let', 'me', 'more', 'most', 'mustn', 'my', 'myself',
+      'no', 'nor', 'not', 'of', 'off', 'on', 'once', 'only', 'or', 'other', 'ought', 'our', 'ours',
+      'ourselves', 'out', 'over', 'own', 'same', 'shan', 'she', 'should', 'shouldn', 'so', 'some', 'such',
+      'than', 'that', 'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there', 'these', 'they',
+      'this', 'those', 'through', 'to', 'too', 'under', 'until', 'up', 'very', 'was', 'wasn', 'we',
+      'were', 'weren', 'what', 'when', 'where', 'which', 'while', 'who', 'whom', 'why', 'with', 'would',
+      'wouldn', 'you', 'your', 'yours', 'yourself', 'yourselves', 'tell', 'show', 'explain', 'give', 'know',
+      'sure', 'please', 'pls', 'ok', 'okay', 'yes', 'yeah', 'yea', 'yep', 'yup', 'yo', 'huh', 'bro', 'dude',
+      'want', 'like', 'really', 'basically', 'wondering', 'mean', 'means', 'thing', 'stuff', 'info',
+      'information', 'tellme', 'thanks', 'thx', 'hey', 'hello', 'hi', 'greetings', 'define', 'meaning'
+    ]);
+
+    const LITERARY_ENTITIES = [
+      'poem', 'poetry', 'song', 'lyrics', 'sonnet', 'ballad', 'ode', 'elegy', 'epic', 
+      'haiku', 'meter', 'rhyme', 'prose', 'novel', 'novella', 'drama', 'metaphor'
+    ];
+
+    // --- PORTER STEMMER ALGORITHM (STANDARD LINGUISTIC RULESET) ---
+    function porterStem(w) {
+      if (w.length <= 2) return w;
+      let word = w.toLowerCase();
+
+      // Step 1a: plurals and third person singular
+      if (word.endsWith('sses')) word = word.slice(0, -2);
+      else if (word.endsWith('ies')) word = word.slice(0, -2);
+      else if (word.endsWith('ss')) {}
+      else if (word.endsWith('s')) word = word.slice(0, -1);
+
+      // Step 1b: past participles and gerunds
+      if (word.endsWith('eed')) { if (word.length > 4) word = word.slice(0, -1); }
+      else if (word.endsWith('ed')) { if (word.length > 4) word = word.slice(0, -2); }
+      else if (word.endsWith('ing')) { if (word.length > 5) word = word.slice(0, -3); }
+
+      // Step 1c: y to i
+      if (word.endsWith('y') && word.length > 3) {
+        word = word.slice(0, -1) + 'i';
+      }
+
+      return word;
+    }
+
+    // --- QUERY NORMALIZER WITH TYPO CORRECTION & CANONICALIZATION ---
+    function normalizeQuery(query) {
+      let text = query.toLowerCase().trim();
+
+      // Contractions expansion
+      text = text.replace(/what's/g, 'what is');
+      text = text.replace(/can't/g, 'cannot');
+      text = text.replace(/won't/g, 'will not');
+      text = text.replace(/n't/g, ' not');
+      text = text.replace(/'re/g, ' are');
+      text = text.replace(/'s/g, '');
+
+      // Strip punctuation
+      text = text.replace(/[?!.,:;"'\]\[()\/\\#$@*~^_]/g, ' ').replace(/\s+/g, ' ').trim();
+
+      // Canonicalize Literature Typos & Variations
+      text = text.replace(/\bpoetries\b/gi, 'poetry');
+      text = text.replace(/\bpoetrie\b/gi, 'poetry');
+      text = text.replace(/\bpoeme?s?\b/gi, 'poem');
+      text = text.replace(/\bpoetics?\b/gi, 'poetry');
+      text = text.replace(/\blyrical\b/gi, 'lyrics');
+      text = text.replace(/\blyric\b/gi, 'lyrics');
+      text = text.replace(/\bsoongs?\b/gi, 'song');
+      text = text.replace(/\bsonets?\b/gi, 'sonnet');
+      text = text.replace(/\bsonnets?\b/gi, 'sonnet');
+      text = text.replace(/\bbalads?\b/gi, 'ballad');
+      text = text.replace(/\belegies\b/gi, 'elegy');
+      text = text.replace(/\belegys?\b/gi, 'elegy');
+      text = text.replace(/\bhaikoo\b/gi, 'haiku');
+      text = text.replace(/\bhaikus\b/gi, 'haiku');
+      text = text.replace(/\brythm\b/gi, 'rhythm');
+      text = text.replace(/\brhythms?\b/gi, 'rhythm');
+      text = text.replace(/\brhyms?\b/gi, 'rhyme');
+      text = text.replace(/\bmeters?\b/gi, 'meter');
+      text = text.replace(/\bmetres?\b/gi, 'meter');
+      text = text.replace(/\bmetaphorical\b/gi, 'metaphor');
+      text = text.replace(/\bfree\s*verse\b/gi, 'free verse');
+      text = text.replace(/\bvers\s*libre\b/gi, 'free verse');
+      text = text.replace(/\bshort\s*stories\b/gi, 'short story');
+      text = text.replace(/\bplay\s*wright\b/gi, 'drama');
+      text = text.replace(/\btheatrical\b/gi, 'drama');
+
+      return text.replace(/\s+/g, ' ').trim();
+    }
+
+    function getQueryTokens(query) {
+      const normalized = normalizeQuery(query);
+      const raw = normalized.match(/[a-z0-9]+/g) || [];
+      const filtered = raw.filter(w => !STOPWORDS.has(w) && w.length > 1);
+      return filtered.map(w => porterStem(w));
+    }
+
+    function getFaqTokens(faq) {
+      const text = `${faq.question} ${faq.question} ${faq.keywords.join(' ')} ${faq.shortAnswer}`;
+      const normalized = normalizeQuery(text);
+      const raw = normalized.match(/[a-z0-9]+/g) || [];
+      const filtered = raw.filter(w => !STOPWORDS.has(w) && w.length > 1);
+      return filtered.map(w => porterStem(w));
+    }
+
+    // --- TF-IDF & COSINE SIMILARITY SEARCH ENGINE ---
+    class SearchEngine {
+      constructor(faqs) {
+        this.faqs = faqs;
+        this.docTokens = new Map();
+        this.docVectors = new Map();
+        this.docFrequencies = new Map();
+        this.totalDocs = faqs.length;
+
+        // Build inverted dictionary
+        for (const faq of faqs) {
+          const tokens = getFaqTokens(faq);
+          this.docTokens.set(faq.id, tokens);
+          const unique = new Set(tokens);
+          for (const t of unique) {
+            this.docFrequencies.set(t, (this.docFrequencies.get(t) || 0) + 1);
+          }
+        }
+
+        // Precompute TF-IDF document vectors
+        for (const faq of faqs) {
+          const tokens = this.docTokens.get(faq.id) || [];
+          this.docVectors.set(faq.id, this.computeTfidf(tokens));
+        }
+      }
+
+      computeTfidf(tokens) {
+        const tf = new Map();
+        for (const t of tokens) tf.set(t, (tf.get(t) || 0) + 1);
+        const vec = new Map();
+        for (const [t, count] of tf) {
+          const df = this.docFrequencies.get(t) || 0;
+          const idf = Math.log((this.totalDocs + 1) / (df + 1)) + 1;
+          const weight = (1 + Math.log(count)) * idf;
+          vec.set(t, weight);
+        }
+        return vec;
+      }
+
+      cosine(vA, vB) {
+        let dot = 0;
+        let nA = 0;
+        let nB = 0;
+        for (const [t, wA] of vA) {
+          nA += wA * wA;
+          const wB = vB.get(t) || 0;
+          dot += wA * wB;
+        }
+        for (const [, wB] of vB) nB += wB * wB;
+        if (nA === 0 || nB === 0) return 0;
+        return dot / (Math.sqrt(nA) * Math.sqrt(nB));
+      }
+
+      search(query, threshold = 0.18) {
+        const normQuery = normalizeQuery(query);
+        const queryLower = query.toLowerCase();
+        const queryTokens = getQueryTokens(query);
+        const queryVector = this.computeTfidf(queryTokens);
+        const normTokensSet = new Set(normQuery.match(/[a-z0-9]+/g) || []);
+
+        const entitiesInQuery = LITERARY_ENTITIES.filter(
+          e => normTokensSet.has(e) || queryLower.includes(e)
+        );
+
+        // Detect comparative intent
+        const isExplicitComparison = 
+          /(compare|versus|\bvs\b|difference|differ|between|\bor\b)\b/i.test(query) || 
+          entitiesInQuery.length >= 2;
+
+        const results = [];
+
+        for (const faq of this.faqs) {
+          const docTokens = this.docTokens.get(faq.id) || [];
+          const docVector = this.docVectors.get(faq.id) || new Map();
+          const docTokenSet = new Set(docTokens);
+
+          const cos = this.cosine(queryVector, docVector);
+          let finalScore = cos;
+
+          // Exact keyword phrase boosting
+          let kwBoost = 0;
+          for (const kw of faq.keywords) {
+            const kwNorm = normalizeQuery(kw);
+            if (normQuery.includes(kwNorm) || queryLower.includes(kw.toLowerCase())) {
+              kwBoost = Math.max(kwBoost, kwNorm.includes(' ') ? 0.38 : 0.25);
+            }
+          }
+
+          // Term coverage calculation
+          const uniqueQuery = Array.from(new Set(queryTokens));
+          const matchedCount = uniqueQuery.filter(t => docTokenSet.has(t)).length;
+          const coverage = uniqueQuery.length > 0 ? matchedCount / uniqueQuery.length : 0;
+
+          if (coverage === 1.0 && uniqueQuery.length > 0) {
+            finalScore = Math.max(finalScore + kwBoost, 0.72 + (0.22 * cos));
+          } else if (coverage >= 0.5) {
+            finalScore = Math.max(finalScore + kwBoost, 0.45 + (0.35 * coverage));
+          } else {
+            finalScore = Math.min(finalScore + kwBoost, 1.0);
+          }
+
+          // Intent Routing
+          if (faq.category === 'comparative') {
+            if (!isExplicitComparison) {
+              finalScore = Math.max(0, finalScore - 0.45);
+            } else {
+              finalScore = Math.min(1.0, finalScore + 0.30);
+            }
+          } else {
+            if (faq.primaryEntity && entitiesInQuery.includes(faq.primaryEntity) && !isExplicitComparison) {
+              finalScore = Math.min(1.0, finalScore + 0.35);
+            }
+          }
+
+          const matchedTerms = queryTokens.filter(t => docTokenSet.has(t));
+
+          results.push({
+            faq,
+            score: Number(finalScore.toFixed(3)),
+            matchedTerms: Array.from(new Set(matchedTerms))
+          });
+        }
+
+        results.sort((a, b) => b.score - a.score);
+        const best = (results.length > 0 && results[0].score >= threshold) ? results[0] : null;
+        return { bestMatch: best, allMatches: results };
+      }
+    }
+
+    // --- APPLICATION CONTROLLER ---
+    const engine = new SearchEngine(FAQ_DATABASE);
+
+    const POPULAR_QUESTIONS = [
+      'What are poems?',
+      'What are songs?',
+      'Difference between poem and song?',
+      'What is a sonnet?',
+      'What is an ode?',
+      'What is poetic meter?'
+    ];
+
+    let messages = [
+      {
+        id: 'welcome',
+        sender: 'bot',
+        text: "Welcome to Lyra. I am an analytical reference engine for poetics, songcraft, and classical literary forms. Inquire freely about poems, song lyrics, poetic meters, sonnets, odes, or the subtle boundaries between verse and prose.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        suggestedQuestions: [
+          'What are poems and what is poetry?',
+          'What are songs and song lyrics?',
+          'What is the difference between a poem and a song?'
+        ]
+      }
+    ];
+
+    let expandedDetailsId = null;
+    let currentCategoryFilter = 'all';
+
+    // DOM References
+    const chatScroll = document.getElementById('chatScroll');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const quickPills = document.getElementById('quickPills');
+    const resetBtn = document.getElementById('resetBtn');
+    const infoBtn = document.getElementById('infoBtn');
+    const aboutModal = document.getElementById('aboutModal');
+    const closeAboutBtn = document.getElementById('closeAboutBtn');
+    const gotItBtn = document.getElementById('gotItBtn');
+    const browseBtn = document.getElementById('browseBtn');
+    const browseModal = document.getElementById('browseModal');
+    const closeBrowseBtn = document.getElementById('closeBrowseBtn');
+    const closeBrowseFooterBtn = document.getElementById('closeBrowseFooterBtn');
+    const browseList = document.getElementById('browseList');
+    const faqSearchInput = document.getElementById('faqSearchInput');
+    const categoryFilterRow = document.getElementById('categoryFilterRow');
+
+    function renderMessages() {
+      chatScroll.innerHTML = '';
+      messages.forEach(msg => {
+        const isUser = msg.sender === 'user';
+        const isDetailsOpen = expandedDetailsId === msg.id;
+
+        const row = document.createElement('div');
+        row.className = `flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`;
+
+        // Shaded Avatar Seal
+        const avatar = document.createElement('div');
+        avatar.className = `w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-mono font-bold shadow-2xs ${
+          isUser
+            ? 'bg-gradient-to-tr from-[#163526] to-[#2B5E46] text-white border border-[#3E7A5D]/30'
+            : 'bg-[#EBF3ED] text-[#1E4332] border border-[#CFDFD3]'
+        }`;
+        avatar.textContent = isUser ? 'You' : 'Ly';
+
+        // Message Body Box
+        const contentBox = document.createElement('div');
+        contentBox.className = `max-w-[88%] sm:max-w-[82%] space-y-1.5 ${isUser ? 'items-end' : 'items-start'}`;
+
+        const bubble = document.createElement('div');
+        bubble.className = `p-3.5 sm:p-4 rounded-2xl text-xs sm:text-sm leading-relaxed ${
+          isUser
+            ? 'bg-gradient-to-r from-[#1E4332] to-[#2A5C44] text-white rounded-tr-none shadow-sm'
+            : 'bg-white border border-[#D5E3D8] text-[#152B1E] rounded-tl-none shadow-xs'
+        }`;
+
+        let innerHTML = '';
+
+        // Unboxed metadata discipline (Zero-pill rule: unboxed text with subtle separators)
+        if (!isUser && msg.similarityScore !== undefined) {
+          innerHTML += `
+            <div class="flex items-center gap-2 mb-2 pb-2 border-b border-[#E2ECE5] text-[11px] font-mono">
+              <span class="font-semibold text-[#1E4332] flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+                ${Math.round(msg.similarityScore * 100)}% Match
+              </span>
+              <span aria-hidden="true" class="text-[#A2C2AC]">/</span>
+              <span class="uppercase tracking-widest text-[#2B5E46] font-bold">${msg.matchedFaq ? escapeHtml(msg.matchedFaq.category) : 'Analysis'}</span>
+            </div>
+          `;
+        }
+
+        innerHTML += `<div class="whitespace-pre-line leading-relaxed ${isUser ? 'text-white' : 'text-[#152B1E]'}">${escapeHtml(msg.text)}</div>`;
+
+        // Expandable Deep Dive Essay Drawer
+        if (!isUser && msg.matchedFaq) {
+          innerHTML += `
+            <div class="mt-3 pt-2.5 border-t border-[#E2ECE5]">
+              <button onclick="toggleDetails('${msg.id}')" class="text-xs text-[#1E4332] hover:text-[#142B1E] font-semibold flex items-center gap-1.5 cursor-pointer transition-colors">
+                <span>${isDetailsOpen ? 'Conceal canonical treatise' : 'Read canonical treatise'}</span>
+                <span class="text-[10px]">${isDetailsOpen ? '▲' : '▼'}</span>
+              </button>
+              ${isDetailsOpen ? `
+                <div class="mt-2.5 text-xs text-[#1E3B29] space-y-2.5 bg-[#F2F7F4] p-4 rounded-xl border border-[#CFDFD3] leading-relaxed shadow-inner">
+                  <div class="font-serif text-[13px] sm:text-sm text-[#142B1E] whitespace-pre-line leading-relaxed">${escapeHtml(msg.matchedFaq.fullAnswer)}</div>
+                  ${msg.matchedTokens && msg.matchedTokens.length ? `
+                    <div class="pt-2.5 border-t border-[#D9E7DD] text-[11px] text-[#4A6D56] font-mono">
+                      <span class="text-[#1E4332] font-semibold">NLP Matched Stems: </span>${msg.matchedTokens.join(', ')}
+                    </div>
+                  ` : ''}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+
+        bubble.innerHTML = innerHTML;
+        contentBox.appendChild(bubble);
+
+        // Suggested Follow-Up Inquiries with Shaded Celadon Buttons
+        if (!isUser && msg.suggestedQuestions && msg.suggestedQuestions.length) {
+          const chipWrap = document.createElement('div');
+          chipWrap.className = 'pt-1 flex flex-wrap gap-1.5';
+          msg.suggestedQuestions.forEach(q => {
+            const btn = document.createElement('button');
+            btn.className = 'px-3 py-1.5 rounded-xl bg-[#E8F1EA] hover:bg-[#DCEADA] text-[#1E4332] hover:text-[#11251B] border border-[#CCDDCF] text-xs text-left transition-all cursor-pointer shadow-2xs font-medium';
+            btn.textContent = q;
+            btn.onclick = () => handleSend(q);
+            chipWrap.appendChild(btn);
+          });
+          contentBox.appendChild(chipWrap);
+        }
+
+        // Timestamp
+        const timeDiv = document.createElement('div');
+        timeDiv.className = `text-[10px] text-[#5C7D68] font-mono px-1 ${isUser ? 'text-right' : 'text-left'}`;
+        timeDiv.textContent = msg.timestamp;
+        contentBox.appendChild(timeDiv);
+
+        row.appendChild(avatar);
+        row.appendChild(contentBox);
+        chatScroll.appendChild(row);
+      });
+
+      chatScroll.scrollTop = chatScroll.scrollHeight;
+    }
+
+    window.toggleDetails = function(id) {
+      expandedDetailsId = (expandedDetailsId === id) ? null : id;
+      renderMessages();
+    };
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function handleSend(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Append User message
+      messages.push({
+        id: `user-${Date.now()}`,
+        sender: 'user',
+        text: trimmed,
+        timestamp: time
+      });
+
+      // Execute TF-IDF search
+      const searchRes = engine.search(trimmed, 0.18);
+      const best = searchRes.bestMatch;
+
+      let botMsg;
+      if (best) {
+        const relatedIds = best.faq.relatedQuestionIds || [];
+        const followUps = FAQ_DATABASE
+          .filter(f => relatedIds.includes(f.id) && f.id !== best.faq.id)
+          .map(f => f.question)
+          .slice(0, 3);
+
+        botMsg = {
+          id: `bot-${Date.now()}`,
+          sender: 'bot',
+          text: best.faq.shortAnswer,
+          matchedFaq: best.faq,
+          similarityScore: best.score,
+          matchedTokens: best.matchedTerms,
+          suggestedQuestions: followUps.length ? followUps : undefined,
+          timestamp: time
+        };
+      } else {
+        const top3 = searchRes.allMatches.slice(0, 3).map(m => m.faq.question);
+        botMsg = {
+          id: `bot-${Date.now()}`,
+          sender: 'bot',
+          text: "No precise correspondence was identified for that formulation in the literary canon. Explore these closely related inquiries:",
+          suggestedQuestions: top3,
+          timestamp: time
+        };
+      }
+
+      messages.push(botMsg);
+      renderMessages();
+      chatInput.value = '';
+    }
+
+    // Popular Carousel Pills
+    function renderPills() {
+      quickPills.querySelectorAll('button').forEach(b => b.remove());
+      POPULAR_QUESTIONS.forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'px-3 py-1 rounded-xl bg-[#E8F1EA] hover:bg-[#DCEADA] text-[#1E4332] hover:text-[#11251B] border border-[#CCDDCF] text-xs whitespace-nowrap transition-all cursor-pointer shadow-2xs font-medium';
+        btn.textContent = q;
+        btn.onclick = () => handleSend(q);
+        quickPills.appendChild(btn);
+      });
+    }
+
+    // Browse Archive Modal
+    function renderBrowseList(filter = '') {
+      browseList.innerHTML = '';
+      const f = filter.toLowerCase().trim();
+      const filtered = FAQ_DATABASE.filter(item => {
+        const matchesCategory = currentCategoryFilter === 'all' || item.category === currentCategoryFilter;
+        const matchesSearch = !f || item.question.toLowerCase().includes(f) || item.keywords.some(k => k.toLowerCase().includes(f));
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        browseList.innerHTML = `
+          <div class="py-8 text-center text-xs text-[#5C7D68]">
+            No literary topics match the query "${escapeHtml(filter)}".
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(faq => {
+        const item = document.createElement('div');
+        item.className = 'p-3.5 rounded-xl bg-white border border-[#CFDFD3] hover:border-[#1E4332] hover:bg-[#F2F7F4] cursor-pointer transition-all space-y-1.5 shadow-2xs';
+        item.innerHTML = `
+          <div class="flex items-center justify-between text-[10px] font-mono">
+            <span class="uppercase tracking-widest font-bold text-[#1E4332]">${escapeHtml(faq.category)}</span>
+            <span class="text-[#2B5E46] font-semibold hover:underline flex items-center gap-1">Consult topic &rarr;</span>
+          </div>
+          <h3 class="text-xs font-bold text-[#142B1E]">${escapeHtml(faq.question)}</h3>
+          <p class="text-[11px] text-[#345942] line-clamp-2 leading-relaxed">${escapeHtml(faq.shortAnswer)}</p>
+        `;
+        item.onclick = () => {
+          handleSend(faq.question);
+          browseModal.classList.add('hidden');
+        };
+        browseList.appendChild(item);
+      });
+    }
+
+    // Category Filter Buttons
+    categoryFilterRow.addEventListener('click', (e) => {
+      const btn = e.target.closest('.cat-filter-btn');
+      if (!btn) return;
+      currentCategoryFilter = btn.dataset.cat;
+      categoryFilterRow.querySelectorAll('.cat-filter-btn').forEach(b => {
+        b.className = 'cat-filter-btn px-2.5 py-1 rounded-lg bg-[#E7F0E9] hover:bg-[#D9E7DD] text-[#284835] cursor-pointer';
+      });
+      btn.className = 'cat-filter-btn px-2.5 py-1 rounded-lg bg-[#1E4332] text-white font-medium cursor-pointer shadow-2xs';
+      renderBrowseList(faqSearchInput.value);
+    });
+
+    // Form submission
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleSend(chatInput.value);
+    });
+
+    // Reset conversation
+    resetBtn.addEventListener('click', () => {
+      messages = [
+        {
+          id: `welcome-${Date.now()}`,
+          sender: 'bot',
+          text: "Dialogue renewed. Feel welcome to consult on songs, poems, sonnets, metrics, or literary devices.",
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          suggestedQuestions: [
+            'What is poetry and what are poems?',
+            'What is the difference between a poem and a song?',
+            'What is poetic meter and how do poetic feet work?'
+          ]
+        }
+      ];
+      renderMessages();
+    });
+
+    // Modals
+    infoBtn.onclick = () => aboutModal.classList.remove('hidden');
+    closeAboutBtn.onclick = () => aboutModal.classList.add('hidden');
+    gotItBtn.onclick = () => aboutModal.classList.add('hidden');
+
+    browseBtn.onclick = () => {
+      renderBrowseList(faqSearchInput.value);
+      browseModal.classList.remove('hidden');
+    };
+    closeBrowseBtn.onclick = () => browseModal.classList.add('hidden');
+    closeBrowseFooterBtn.onclick = () => browseModal.classList.add('hidden');
+
+    faqSearchInput.addEventListener('input', (e) => {
+      renderBrowseList(e.target.value);
+    });
+
+    // Click outside to close modals
+    aboutModal.addEventListener('click', (e) => {
+      if (e.target === aboutModal) aboutModal.classList.add('hidden');
+    });
+    browseModal.addEventListener('click', (e) => {
+      if (e.target === browseModal) browseModal.classList.add('hidden');
+    });
+
+    // Initialize application
+    renderPills();
+    renderMessages();
+  </script>
+</body>
+</html>
